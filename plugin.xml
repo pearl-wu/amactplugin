@@ -16,7 +16,12 @@
 		</config-file>
 
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
-			<activity android:name="com.bais.amactplugin.appactivity" />
+		    <activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
+                      android:label="@string/activity_name" android:launchMode="singleTop"
+                      android:name="com.bais.amactplugin.WebViewActivity"
+                      android:screenOrientation="portrait" android:theme="@android:style/Theme.Black.NoTitleBar"
+                      android:windowSoftInputMode="adjustResize" android:exported="true">
+            </activity>
 		</config-file>
 
 		<config-file parent="/manifest" target="AndroidManifest.xml">
