@@ -57,8 +57,9 @@ public class amactplugin extends CordovaPlugin {
               this.params = args.getJSONObject(0);
               String webUrl = params.getString("url");
               callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-              Toast.makeText(this.cordova.getActivity(),webUrl,Toast.LENGTH_SHORT).show(); 
-              if(!"".equals(webUrl)) {
+              //Toast.makeText(this.cordova.getActivity(),webUrl,Toast.LENGTH_SHORT).show(); 
+             this.cordova.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); 
+             if(!"".equals(webUrl)) {
                 showWebView(webUrl, shouldShowLoading);
                 JSONObject r = new JSONObject();
                 r.put("responseCode", "ok");
