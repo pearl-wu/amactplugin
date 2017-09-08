@@ -57,7 +57,13 @@ public class amactplugin extends CordovaPlugin {
               this.params = args.getJSONObject(0);
               String webUrl = params.getString("url");
               callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-              Toast.makeText(this.cordova.getActivity(),webUrl,Toast.LENGTH_SHORT).show();    
+              Toast.makeText(this.cordova.getActivity(),webUrl,Toast.LENGTH_SHORT).show(); 
+              if(!"".equals(webUrl)) {
+                showWebView(webUrl, shouldShowLoading);
+                JSONObject r = new JSONObject();
+                r.put("responseCode", "ok");
+                callbackContext.success(r);
+              }
               return true;
           }else if(action.equals("hide")) {
               LOG.d(LOG_TAG, "Hide Web View");
@@ -68,4 +74,23 @@ public class amactplugin extends CordovaPlugin {
             }
         return false;
      }
+    
+    private void showWebView(final String url, Boolean shouldShowLoading) {
+        LOG.d(LOG_TAG, "Url: " + url);
+        Intent i = new Intent(this.cordova.getActivity(), WebViewActivity.class);
+        i.putExtra("url", url);
+        i.putExtra("shouldShowLoading", shouldShowLoading);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        this.cordova.getActivity().getApplicationContext().startActivity(i);
+      }
+
+      private void hideWebView() {
+        LOG.d(LOG_TAG, "hideWebView");
+        this.cordova.getActivity().finish();
+        if(subscribeCallbackContext != null){
+          LOG.d(LOG_TAG, "Calling subscribeCallbackContext success");
+          subscribeCallbackContext.success();
+          subscribeCallbackContext = null;
+        }
+      }
 }
