@@ -16,7 +16,7 @@
 		</config-file>
 
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
-			<activity android:name="com.bais.amactplugin.amactplugin" />
+			<activity android:name="com.bais.amactplugin.appactivity" />
 		</config-file>
 
 		<config-file parent="/manifest" target="AndroidManifest.xml">
@@ -28,6 +28,6 @@
 		</config-file>
 		
 		<source-file src="src/android/amactplugin.java" target-dir="src/com/bais/amactplugin/" />
-		
+		<source-file src="src/android/appactivity.java" target-dir="src/com/bais/amactplugin/" />
 	</platform>
 </plugin>
