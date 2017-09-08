@@ -29,6 +29,7 @@ public class amactplugin extends CordovaPlugin {
                 //Handle exception
                 this.callbackContext.error(e.hashCode());
             }
+          return true;
        }
         
        if(action.equals("openweb")){
@@ -55,7 +56,6 @@ public class amactplugin extends CordovaPlugin {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
                 Toast.makeText(this.cordova.getActivity(),"尚未安裝IBC",Toast.LENGTH_LONG).show();
             }
-
             return true;
           }
         
@@ -63,7 +63,8 @@ public class amactplugin extends CordovaPlugin {
               this.params = args.getJSONObject(0);
               String webUrl = params.getString("url");
               callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-              Toast.makeText(this.cordova.getActivity(),webUrl,Toast.LENGTH_SHORT).show();          
+              Toast.makeText(this.cordova.getActivity(),webUrl,Toast.LENGTH_SHORT).show();    
+              return true;
           }
         return false;
      }
