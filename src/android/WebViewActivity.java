@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
+
 import org.apache.cordova.CordovaActivity;
 
 public class WebViewActivity extends CordovaActivity {
@@ -19,8 +19,8 @@ public class WebViewActivity extends CordovaActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         //Aqui debo crear el loading
-        setRequesteOrientation(ActivityInfo.SCREEN_ORIENTATION_LADSCAPE);
         activity2 = this;
         Bundle b = getIntent().getExtras();
         String url = b.getString("url");
@@ -44,7 +44,7 @@ public class WebViewActivity extends CordovaActivity {
             public void run() {
                 dialog = new Dialog(activity2,android.R.style.Theme_Translucent_NoTitleBar);
                 ProgressBar progressBar = new ProgressBar(activity2,null,android.R.attr.progressBarStyle);
-                
+
                 LinearLayout linearLayout = new LinearLayout(activity2);
                 linearLayout.setOrientation(LinearLayout.VERTICAL);
                 RelativeLayout layoutPrincipal = new RelativeLayout(activity2);
@@ -93,3 +93,4 @@ public class WebViewActivity extends CordovaActivity {
         return true;
     }
 }
+
