@@ -30,9 +30,7 @@ public class amactplugin extends CordovaPlugin {
                 this.callbackContext.error(e.hashCode());
             }
           return true;
-       }
-        
-       if(action.equals("openweb")){
+       }else if(action.equals("openweb")){
             this.params = args.getJSONObject(0);
             String webUrl = params.getString("url");
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
@@ -40,9 +38,7 @@ public class amactplugin extends CordovaPlugin {
             Intent intent = new Intent(Intent.ACTION_VIEW,uri);
             this.cordova.getActivity().startActivity(intent);
             return true;
-        }
-
-        if(action.equals("openapp")){
+        }else if(action.equals("openapp")){
             this.params = args.getJSONObject(0);
             String webUrl = params.getString("url");
             Intent intent =  this.cordova.getActivity().getPackageManager().getLaunchIntentForPackage(webUrl);
@@ -57,15 +53,19 @@ public class amactplugin extends CordovaPlugin {
                 Toast.makeText(this.cordova.getActivity(),"尚未安裝IBC",Toast.LENGTH_LONG).show();
             }
             return true;
-          }
-        
-          if(action.equals("openwebview")){
+          }else if(action.equals("openwebshow")){
               this.params = args.getJSONObject(0);
               String webUrl = params.getString("url");
               callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
               Toast.makeText(this.cordova.getActivity(),webUrl,Toast.LENGTH_SHORT).show();    
               return true;
-          }
+          }else if(action.equals("hide")) {
+              LOG.d(LOG_TAG, "Hide Web View");
+              hideWebView();
+              JSONObject r = new JSONObject();
+              r.put("responseCode", "ok");
+              this.callbackContext.success(r);
+            }
         return false;
      }
 }
