@@ -20,6 +20,7 @@ public class WebViewActivity extends CordovaActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Aqui debo crear el loading
+        setRequesteOrientation(ActivityInfo.SCREEN_ORIENTATION_LADSCAPE);
         activity2 = this;
         Bundle b = getIntent().getExtras();
         String url = b.getString("url");
