@@ -21,7 +21,7 @@ public class amactplugin extends CordovaPlugin {
     public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
         this.callbackContext = callbackContext;
 
-        if(action.equals("version")){
+      if(action.equals("version")){
             try {
                 PackageInfo packageInfo = cordova.getActivity().getPackageManager().getPackageInfo(cordova.getActivity().getPackageName(), 0);
                 this.callbackContext.success(packageInfo.versionName);
@@ -29,8 +29,9 @@ public class amactplugin extends CordovaPlugin {
                 //Handle exception
                 this.callbackContext.error(e.hashCode());
             }
-        }
-        if(action.equals("openweb")){
+       }
+        
+       if(action.equals("openweb")){
             this.params = args.getJSONObject(0);
             String webUrl = params.getString("url");
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
@@ -56,8 +57,14 @@ public class amactplugin extends CordovaPlugin {
             }
 
             return true;
-        }
-
+          }
+        
+          if(action.equals("openwebview")){
+              this.params = args.getJSONObject(0);
+              String webUrl = params.getString("url");
+              callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+              Toast.makeText(this.cordova.getActivity(),webUrl,Toast.LENGTH_SHORT).show();          
+          }
         return false;
-    }
+     }
 }
