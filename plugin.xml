@@ -39,17 +39,4 @@
 		<source-file src="src/android/WebViewActivity.java" target-dir="src/com/bais/amactplugin/" />
 	</platform>
 
-	<!-- browser 
-	  <platform name="browser">
-	    <config-file target="config.xml" parent="/*">
-		<feature name="WebViewPlugin">
-		    <param name="browser-package" value="WebViewPluginProxy" />
-		</feature>
-	    </config-file>
-
-	    <js-module src="src/WebViewPluginProxy.js" name="WebViewPluginProxy">
-		<runs />
-	    </js-module>
-	  </platform>-->
-
 </plugin>
