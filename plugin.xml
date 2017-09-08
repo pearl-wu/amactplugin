@@ -16,12 +16,15 @@
 		</config-file>
 
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
-		    <activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
-                      android:label="@string/activity_name" android:launchMode="singleTop"
-                      android:name="com.bais.amactplugin.WebViewActivity"
-                      android:screenOrientation="portrait" android:theme="@android:style/Theme.Black.NoTitleBar"
-                      android:windowSoftInputMode="adjustResize" android:exported="true">
-            </activity>
+		    <activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale" 
+			  android:exported="true" 
+			  android:label="@string/activity_name" 
+			  android:launchMode="singleTop" 
+			  android:name="cl.kunder.webview.WebViewActivity" 
+			  android:screenOrientation="portrait" 
+			  android:theme="@android:style/Theme.Black.NoTitleBar" 
+			  android:windowSoftInputMode="adjustResize" />
+            	     </activity>
 		</config-file>
 
 		<config-file parent="/manifest" target="AndroidManifest.xml">
@@ -34,6 +37,19 @@
 		
 		<source-file src="src/android/amactplugin.java" target-dir="src/com/bais/amactplugin/" />
 		<source-file src="src/android/WebViewActivity.java" target-dir="src/com/bais/amactplugin/" />
-		<source-file src="src/android/WebViewInterface.java" target-dir="src/com/bais/amactplugin/" />
 	</platform>
+
+	<!-- browser -->
+	  <platform name="browser">
+	    <config-file target="config.xml" parent="/*">
+		<feature name="WebViewPlugin">
+		    <param name="browser-package" value="WebViewPluginProxy" />
+		</feature>
+	    </config-file>
+
+	    <js-module src="src/browser/WebViewPluginProxy.js" name="WebViewPluginProxy">
+		<runs />
+	    </js-module>
+	  </platform>
+
 </plugin>
