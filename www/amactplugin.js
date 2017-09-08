@@ -11,3 +11,7 @@ exports.openapp = function(message, win, fail){
 exports.openweb = function(message, win, fail){
     exec(win, fail, "amactplugin", "openweb", [message]);
 }
+
+exports.openwebview = function(message, win, fail){
+    exec(win, fail, "amactplugin", "openwebview", [message]);
+}
