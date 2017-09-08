@@ -14,7 +14,9 @@
 				<param name="android-package" value="com.bais.amactplugin.amactplugin" />
 			</feature>
 		</config-file>
-		<activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale" android:exported="true" android:label="@string/activity_name" android:launchMode="singleTop" android:name="com.bais.amactplugin.WebViewActivity" android:theme="@android:style/Theme.Holo.Light.Dialog" />
+		<config-file target="AndroidManifest.xml" parent="/manifest/application">
+		      <activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale" android:label="@string/activity_name" android:launchMode="singleTop" android:name="com.bais.amactplugin.WebViewActivity" android:theme="@android:style/Theme.Holo.Light.Dialog" android:windowSoftInputMode="adjustResize" android:exported="true"></activity>
+		 </config-file>
 		<config-file parent="/manifest" target="AndroidManifest.xml">
 			<uses-permission android:name="android.permission.INTERNET" />
 			<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -23,6 +25,7 @@
 			<uses-permission android:name="android.permission.CAMERA"/>
 		</config-file>
 		
+		<source-file src="src/android/amactplugin.java" target-dir="src/com/bais/amactplugin/" />
 		<source-file src="src/android/amactplugin.java" target-dir="src/com/bais/amactplugin/" />
 	</platform>
 
