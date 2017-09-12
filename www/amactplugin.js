@@ -19,3 +19,15 @@ exports.openwebshow = function(message, win, fail){
 exports.openwebclose = function(win, fail){
     exec(win, fail, "amactplugin", "openwebclose", []);
 }
+
+exports.getcookie = function(message,win, fail){
+    exec(win, fail, "amactplugin", "cookie-get", [message]);
+}
+
+exports.setcookie = function(message,win, fail){
+    exec(win, fail, "amactplugin", "cookie-set", [message]);
+}
+
+exports.clearcookie = function(message,win, fail){
+    exec(win, fail, "amactplugin", "cookie-clear", [message]);
+}
