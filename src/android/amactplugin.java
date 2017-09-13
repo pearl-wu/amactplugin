@@ -6,8 +6,10 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.widget.Toast;
 
 import org.apache.cordova.CallbackContext;
@@ -88,13 +90,31 @@ public class amactplugin extends CordovaPlugin {
               r.put("responseCode", "ok");
               this.callbackContext.success(r);
           }else if(action.equals("cookie-get")){
+              this.params = args.getJSONObject(0);
+              String webUrl = params.getString("url");
               CookieManager.setAcceptFileSchemeCookies(true); //available in android level 12
               CookieManager.getInstance().setAcceptCookie(true); //available in android level 12
-                Log.d("PHPGUID: ", CookieManager.getInstance().getCookie("PHPGUID"));
-                Log.d("MjMtZA%3D%3D: ", CookieManager.getInstance().getCookie("MjMtZA%3D%3D"));
-                Log.d("MjMtcw%3D%3D: ", CookieManager.getInstance().getCookie("MjMtcw%3D%3D"));
-            }
-
+                 String cookie = CookieManager.getInstance().getCookie(webUrl);
+                // String[] AfterSplit = cookie.split(",");
+                this.callbackContext.success(cookie);
+               // Log.d("cookie ", cookie);
+               //Log.d("PHPGUID: ", CookieManager.getInstance().getCookie("PHPGUID"));
+               //Log.d("MjMtZA%3D%3D: ", CookieManager.getInstance().getCookie("MjMtZA%3D%3D"));
+               //Log.d("MjMtcw%3D%3D: ", CookieManager.getInstance().getCookie("MjMtcw%3D%3D"));
+          }else if(action.equals("cookie-clear")){
+                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                      CookieManager.getInstance().removeAllCookies(null);
+                      CookieManager.getInstance().flush();
+                  } else {
+                      CookieSyncManager cookieSyncManager = CookieSyncManager.createInstance(cordova.getActivity());
+                      cookieSyncManager.startSync();
+                      CookieManager cookieManager = CookieManager.getInstance();
+                      cookieManager.removeAllCookie();
+                      cookieManager.removeSessionCookie();
+                      cookieSyncManager.stopSync();
+                      cookieSyncManager.sync();
+                  }
+          }
         return false;
      }
     
@@ -119,7 +139,8 @@ public class amactplugin extends CordovaPlugin {
       }
     @Override
      public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        LOG.d("..............................................", "Calling subscribeCallbackContext success");
+        Log.d("..............", requestCode+"");
+        Toast.makeText(this.cordova.getActivity(),"..................................",Toast.LENGTH_SHORT).show();
         if(resultCode== Activity.RESULT_OK){
             String key=intent.getStringExtra("key");
             Toast.makeText(this.cordova.getActivity(),key,Toast.LENGTH_SHORT).show();
