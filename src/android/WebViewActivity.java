@@ -2,149 +2,160 @@ package com.bais.amactplugin;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.net.Uri;
-import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
-import android.widget.Toast;
+import android.view.View;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.widget.Button;
 
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.LOG;
-import org.apache.cordova.PluginResult;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
-public class amactplugin extends CordovaPlugin {
-    private CallbackContext callbackContext;
-    private JSONObject params;
-    private static final String LOG_TAG = "WebViewPlugin";
-    private static CallbackContext subscribeCallbackContext = null;
-    public static final int REQUEST_CODE = 0;
+import tw.com.bais.amact.R;
+
+public class WebViewActivity extends Activity {
+
+    private WebView mWeb;
+    private String url;
 
     @Override
-    public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
-        this.callbackContext = callbackContext;
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_register);
 
-      if(action.equals("version")){
-            try {
-                PackageInfo packageInfo = cordova.getActivity().getPackageManager().getPackageInfo(cordova.getActivity().getPackageName(), 0);
-                this.callbackContext.success(packageInfo.versionName);
-            } catch (NameNotFoundException e) {
-                //Handle exception
-                this.callbackContext.error(e.hashCode());
+        Bundle bundle = getIntent().getExtras();
+        url = bundle.getString("url");
+        Intent intent=new Intent();
+        setResult(RESULT_OK,intent);
+        mWeb = (WebView) findViewById(R.id.Webs);
+
+        Button home = (Button)findViewById(R.id.button1);
+        Button back = (Button)findViewById(R.id.button2);
+        Button refresh = (Button)findViewById(R.id.button3);
+        home.setOnClickListener(new Button.OnClickListener(){
+            public void onClick(View v){
+                mWeb.loadUrl( url );
             }
-          return true;
-       }else if(action.equals("openweb")){
-            this.params = args.getJSONObject(0);
-            String webUrl = params.getString("url");
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-            Uri uri = Uri.parse(webUrl);
-            Intent intent = new Intent(Intent.ACTION_VIEW,uri);
-            this.cordova.getActivity().startActivity(intent);
-            return true;
-        }else if(action.equals("openapp")){
-            this.params = args.getJSONObject(0);
-            String webUrl = params.getString("url");
-            Intent intent =  this.cordova.getActivity().getPackageManager().getLaunchIntentForPackage(webUrl);
-            // intent空，沒安装
-            if (intent != null) {
-                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-                Toast.makeText(this.cordova.getActivity(),"開啟IBC...",Toast.LENGTH_SHORT).show();
-                //intent.putExtra("name", "air.tw.com.bais.ibc");
-                 this.cordova.getActivity().startActivity(intent);
-            } else {
-                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
-                Toast.makeText(this.cordova.getActivity(),"尚未安裝IBC",Toast.LENGTH_LONG).show();
+        });
+        back.setOnClickListener(new Button.OnClickListener(){
+            public void onClick(View v){
+                mWeb.goBack();
             }
-            return true;
-          }else if(action.equals("openwebshow")){
-              this.params = args.getJSONObject(0);
-              String webUrl = params.getString("url");
-              //this.callbackContext.success("OK");
-              //Toast.makeText(this.cordova.getActivity(),webUrl,Toast.LENGTH_SHORT).show();
-             this.cordova.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-              Boolean shouldShowLoading = false;
-              try{
-                  shouldShowLoading = args.getBoolean(1);
-              }
-              catch(Exception e){
+        });
+        refresh.setOnClickListener(new Button.OnClickListener(){
+            public void onClick(View v){
+                mWeb.reload();
+            }
+        });
 
-              }
-             if(!"".equals(webUrl)) {
-                showWebView(webUrl, shouldShowLoading);
-                JSONObject r = new JSONObject();
-                r.put("responseCode", "ok");
-                callbackContext.success(r);
-              }
-              return true;
-          }else if(action.equals("hide")) {
-              LOG.d(LOG_TAG, "Hide Web View");
-              hideWebView();
-              JSONObject r = new JSONObject();
-              r.put("responseCode", "ok");
-              this.callbackContext.success(r);
-          }else if(action.equals("cookie-get")){
-              this.params = args.getJSONObject(0);
-              String webUrl = params.getString("url");
-              CookieManager.setAcceptFileSchemeCookies(true); //available in android level 12
-              CookieManager.getInstance().setAcceptCookie(true); //available in android level 12
-                 String cookie = CookieManager.getInstance().getCookie(webUrl);
-                // String[] AfterSplit = cookie.split(",");
-                this.callbackContext.success(cookie);
-               // Log.d("cookie ", cookie);
-               //Log.d("PHPGUID: ", CookieManager.getInstance().getCookie("PHPGUID"));
-               //Log.d("MjMtZA%3D%3D: ", CookieManager.getInstance().getCookie("MjMtZA%3D%3D"));
-               //Log.d("MjMtcw%3D%3D: ", CookieManager.getInstance().getCookie("MjMtcw%3D%3D"));
-          }else if(action.equals("cookie-clear")){
-                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                      CookieManager.getInstance().removeAllCookies(null);
-                      CookieManager.getInstance().flush();
-                  } else {
-                      CookieSyncManager cookieSyncManager = CookieSyncManager.createInstance(cordova.getActivity());
-                      cookieSyncManager.startSync();
-                      CookieManager cookieManager = CookieManager.getInstance();
-                      cookieManager.removeAllCookie();
-                      cookieManager.removeSessionCookie();
-                      cookieSyncManager.stopSync();
-                      cookieSyncManager.sync();
-                  }
-          }
-        return false;
-     }
-    
-    private void showWebView(final String url, Boolean shouldShowLoading) {
-        LOG.d(LOG_TAG, "Url: " + url);
-        Intent i = new Intent(this.cordova.getActivity(), WebViewActivity.class);
-        i.putExtra("url", url);
-        i.putExtra("shouldShowLoading", shouldShowLoading);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        this.cordova.getActivity().startActivityForResult(i, REQUEST_CODE);
-        //this.cordova.getActivity().getApplicationContext().startActivity(i);
-      }
+        /*mWeb.setWebViewClient(new WebViewClient(){
+                            public void onPageFinished(WebView view, String url) {
+                                super.onPageFinished(view, url);
+                                String title = view.getTitle();
+                                setTitle( title );
+                                 //    view.loadUrl("javascript: alert(1)");
+                            }
+                        });*/
+            /*mWeb.setWebChromeClient(new WebChromeClient(){
+                            public boolean onConsoleMessage(ConsoleMessage cm) {
+                                Log.d("MyApplication", cm.message() + " -- From line "
+                                        + cm.lineNumber() + " of "
+                                        + cm.sourceId() );
+                                return true;
+                            }
+                        });*/
 
-      private void hideWebView() {
-        LOG.d(LOG_TAG, "hideWebView");
-        this.cordova.getActivity().finish();
-        if(subscribeCallbackContext != null){
-          LOG.d(LOG_TAG, "Calling subscribeCallbackContext success");
-          subscribeCallbackContext.success();
-          subscribeCallbackContext = null;
+
+
+        WebSettings settings = mWeb.getSettings();
+        settings.setJavaScriptEnabled(true);
+        mWeb.addJavascriptInterface(new JsInteration(mWeb), "control");
+        settings.setSupportZoom(false);
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        settings.setDomStorageEnabled(true);
+        settings.setSupportMultipleWindows(false);
+        String ua = "Mozilla/5.0 (eBAIS 1.0) Chrome";
+        settings.setUserAgentString(ua);
+        mWeb.loadUrl( url );
+        /*WebViewActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mWeb.loadUrl( url );
+                    }
+                });*/
+    }
+
+    public void action(String key,String uid,String uname){
+       /* Intent intent=new Intent();
+                intent.putExtra("key", key);
+                setResult(RESULT_OK,intent);*/
+                //finish();
+    }
+
+    public class JsInteration{
+        private WebView aWeb = null;
+        private String UserAgent = null;
+        private String mainKey = "5c3b3ac2abf098b325d89005deccd7e6";
+        public JsInteration(WebView mWeb){
+            aWeb = mWeb;
         }
-      }
-    @Override
-     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        Log.d("..............", requestCode+"");
-        Toast.makeText(this.cordova.getActivity(),"..................................",Toast.LENGTH_SHORT).show();
-        if(resultCode== Activity.RESULT_OK){
-            String key=intent.getStringExtra("key");
-            Toast.makeText(this.cordova.getActivity(),key,Toast.LENGTH_SHORT).show();
-            this.callbackContext.success(key);
+        @JavascriptInterface
+        public void setUserAgent(String val){
+            UserAgent = val;
         }
-     }
+        @JavascriptInterface
+        public Object setUser(String key,String job, String uid, String uname) {
+            /**
+                             key=已組好KEY值
+                             job=哪個社群(google, facebook, twitter, ...?)
+                            uid=UDC USER ID
+                            uname=UDC USER NAME
+                         * */
+            String chkkey = md5( mainKey + "-" + md5( uid + "-" + uname ) );
+            Log.d("key", key);
+            Log.d("uid", uid);
+            Log.d("uname", uname);
+
+            if(key == chkkey){
+                action(key,uid,uname);
+                return key.toString();
+            }else{
+                //KEY組起來跟回傳已組好的值不同時處理
+            }
+            return key.toString();
+        }
+        @JavascriptInterface
+        public void setUser(String key, String job, String uid){
+            setUser(key, job, uid, "");
+        }
+        @JavascriptInterface
+        public void setUser(String key, String job){
+            setUser(key, job, "");
+        }
+        @JavascriptInterface
+        public void setUser(String key){
+            setUser(key, "");
+        }
+    }
+
+    public static String md5(String string) {
+        byte[] hash;
+        try {
+            hash = MessageDigest.getInstance("MD5").digest(string.getBytes("UTF-8"));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Huh, MD5 should be supported?", e);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Huh, UTF-8 should be supported?", e);
+        }
+        StringBuilder hex = new StringBuilder(hash.length * 2);
+        for (byte b : hash) {
+            int i = (b & 0xFF);
+            if (i < 0x10) hex.append('0');
+            hex.append(Integer.toHexString(i));
+        }
+        return hex.toString();
+    }
 }
