@@ -18,6 +18,18 @@
 		      <activity android:name="com.bais.amactplugin.amactplugin" />
 		      <activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale" android:name="com.bais.amactplugin.WebViewActivity" android:theme="@android:style/Theme.Holo.NoActionBar" />
 		 </config-file>
+		<config-file target="res/values/strings.xml" parent="/resources">
+		        <string name="title_home">Home</string>
+			<string name="title_refresh">Refresh</string>
+			<string name="title_back">Back</string>
+			<string name="launcher_name"></string>
+			<string name="activity_name"></string>
+		</config-file>
+		<config-file target="res/menu/navigation.xml" parent="/resources">
+		    <item android:id="@+id/home" android:title="@string/title_home" />
+		    <item android:id="@+id/back" android:title="Back" />
+		    <item android:id="@+id/refresh" android:title="Refresh" />
+		</config-file>
 		<config-file parent="/manifest" target="AndroidManifest.xml">
 			<uses-permission android:name="android.permission.INTERNET" />
 			<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
