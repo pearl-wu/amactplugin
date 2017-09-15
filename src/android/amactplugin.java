@@ -7,7 +7,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.Toast;
@@ -26,12 +25,14 @@ public class amactplugin extends CordovaPlugin {
     private static final String LOG_TAG = "WebViewPlugin";
     private static CallbackContext subscribeCallbackContext = null;
     public static final int REQUEST_CODE = 0;
+    static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
 
     @Override
     public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
         this.callbackContext = callbackContext;
 
-      if(action.equals("version")){
+
+        if(action.equals("version")){
             try {
                 PackageInfo packageInfo = cordova.getActivity().getPackageManager().getPackageInfo(cordova.getActivity().getPackageName(), 0);
                 this.callbackContext.success(packageInfo.versionName);
@@ -46,21 +47,21 @@ public class amactplugin extends CordovaPlugin {
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
             Uri uri = Uri.parse(webUrl);
             Intent intent = new Intent(Intent.ACTION_VIEW,uri);
-            this.cordova.getActivity().startActivity(intent);
+            cordova.getActivity().startActivity(intent);
             return true;
         }else if(action.equals("openapp")){
             this.params = args.getJSONObject(0);
             String webUrl = params.getString("url");
-            Intent intent =  this.cordova.getActivity().getPackageManager().getLaunchIntentForPackage(webUrl);
+            Intent intent =  cordova.getActivity().getPackageManager().getLaunchIntentForPackage(webUrl);
             // intent空，沒安装
             if (intent != null) {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-                Toast.makeText(this.cordova.getActivity(),"開啟IBC...",Toast.LENGTH_SHORT).show();
+                Toast.makeText(cordova.getActivity(),"開啟IBC...",Toast.LENGTH_SHORT).show();
                 //intent.putExtra("name", "air.tw.com.bais.ibc");
-                 this.cordova.getActivity().startActivity(intent);
+                 cordova.getActivity().startActivity(intent);
             } else {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
-                Toast.makeText(this.cordova.getActivity(),"尚未安裝IBC",Toast.LENGTH_LONG).show();
+                Toast.makeText(cordova.getActivity(),"尚未安裝IBC",Toast.LENGTH_LONG).show();
             }
             return true;
           }else if(action.equals("openwebshow")){
@@ -68,7 +69,7 @@ public class amactplugin extends CordovaPlugin {
               String webUrl = params.getString("url");
               //this.callbackContext.success("OK");
               //Toast.makeText(this.cordova.getActivity(),webUrl,Toast.LENGTH_SHORT).show();
-             this.cordova.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+             cordova.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
               Boolean shouldShowLoading = false;
               try{
                   shouldShowLoading = args.getBoolean(1);
@@ -80,7 +81,7 @@ public class amactplugin extends CordovaPlugin {
                 showWebView(webUrl, shouldShowLoading);
                 JSONObject r = new JSONObject();
                 r.put("responseCode", "ok");
-                callbackContext.success(r);
+                //callbackContext.success(r);
               }
               return true;
           }else if(action.equals("hide")) {
@@ -117,34 +118,36 @@ public class amactplugin extends CordovaPlugin {
           }
         return false;
      }
-    
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //Toast.makeText(cordova.getActivity(),requestCode+"......",Toast.LENGTH_SHORT).show();
+        JSONArray json = new JSONArray();
+        if (resultCode == Activity.RESULT_OK) {
+            json.put(data.getStringExtra("key"));
+            json.put(data.getStringExtra("job"));
+            json.put(data.getStringExtra("uid"));
+            json.put(data.getStringExtra("uname"));
+            this.callbackContext.success("ok");
+        }
+    }
+
     private void showWebView(final String url, Boolean shouldShowLoading) {
         LOG.d(LOG_TAG, "Url: " + url);
-        Intent i = new Intent(this.cordova.getActivity(), WebViewActivity.class);
+        Intent i = new Intent(cordova.getActivity(), WebViewActivity.class);
         i.putExtra("url", url);
         i.putExtra("shouldShowLoading", shouldShowLoading);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        this.cordova.getActivity().startActivityForResult(i, REQUEST_CODE);
+        //i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        cordova.startActivityForResult((CordovaPlugin)this, i, REQUEST_CODE);
+        //cordova.setActivityResultCallback(this);
         //this.cordova.getActivity().getApplicationContext().startActivity(i);
       }
 
       private void hideWebView() {
         LOG.d(LOG_TAG, "hideWebView");
-        this.cordova.getActivity().finish();
+        cordova.getActivity().finish();
         if(subscribeCallbackContext != null){
           LOG.d(LOG_TAG, "Calling subscribeCallbackContext success");
           subscribeCallbackContext.success();
           subscribeCallbackContext = null;
         }
       }
-    @Override
-     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        Log.d("..............", requestCode+"");
-        Toast.makeText(this.cordova.getActivity(),"..................................",Toast.LENGTH_SHORT).show();
-        if(resultCode== Activity.RESULT_OK){
-            String key=intent.getStringExtra("key");
-            Toast.makeText(this.cordova.getActivity(),key,Toast.LENGTH_SHORT).show();
-            this.callbackContext.success(key);
-        }
-     }
 }
