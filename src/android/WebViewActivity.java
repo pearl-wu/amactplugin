@@ -1,37 +1,39 @@
 package com.bais.amactplugin;
 
-import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.Toast;
+
+import org.apache.cordova.CordovaActivity;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 import tw.com.bais.amact.R;
 
-public class WebViewActivity extends Activity {
-
+public class WebViewActivity extends CordovaActivity {
     private WebView mWeb;
     private String url;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
         Bundle bundle = getIntent().getExtras();
         url = bundle.getString("url");
         Intent intent=new Intent();
-        setResult(RESULT_OK,intent);
-        mWeb = (WebView) findViewById(R.id.Webs);
 
+        mWeb = (WebView) findViewById(R.id.Webs);
         Button home = (Button)findViewById(R.id.button1);
         Button back = (Button)findViewById(R.id.button2);
         Button refresh = (Button)findViewById(R.id.button3);
@@ -50,7 +52,6 @@ public class WebViewActivity extends Activity {
                 mWeb.reload();
             }
         });
-
         /*mWeb.setWebViewClient(new WebViewClient(){
                             public void onPageFinished(WebView view, String url) {
                                 super.onPageFinished(view, url);
@@ -58,41 +59,63 @@ public class WebViewActivity extends Activity {
                                 setTitle( title );
                                  //    view.loadUrl("javascript: alert(1)");
                             }
-                        });*/
-            /*mWeb.setWebChromeClient(new WebChromeClient(){
+                 });*/
+         /*mWeb.setWebChromeClient(new WebChromeClient(){
                             public boolean onConsoleMessage(ConsoleMessage cm) {
                                 Log.d("MyApplication", cm.message() + " -- From line "
                                         + cm.lineNumber() + " of "
                                         + cm.sourceId() );
                                 return true;
                             }
-                        });*/
-
-
+                  });*/
 
         WebSettings settings = mWeb.getSettings();
         settings.setJavaScriptEnabled(true);
         mWeb.addJavascriptInterface(new JsInteration(mWeb), "control");
-        settings.setSupportZoom(false);
-        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        settings.setLoadWithOverviewMode(true);
+        settings.setBuiltInZoomControls(false);
+        settings.setJavaScriptEnabled(true);
+        settings.setDatabaseEnabled(true);
         settings.setDomStorageEnabled(true);
-        settings.setSupportMultipleWindows(false);
+        settings.setAllowContentAccess(true);
+        settings.setAllowUniversalAccessFromFileURLs(true);
+        settings.setAllowFileAccessFromFileURLs(true);
+        settings.setAllowContentAccess(true);
+        settings.setAppCacheEnabled(true);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            settings.setDatabasePath("/data/data/" + mWeb.getContext().getPackageName() + "/databases/");
+        }
+
+        settings.setSupportZoom(false);
+
+
         String ua = "Mozilla/5.0 (eBAIS 1.0) Chrome";
         settings.setUserAgentString(ua);
-        mWeb.loadUrl( url );
-        /*WebViewActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mWeb.loadUrl( url );
-                    }
-                });*/
+        WebViewActivity.this.runOnUiThread(new Runnable() {
+            @Override
+             public void run() {
+                mWeb.loadUrl( url );
+             }
+        });
     }
 
-    public void action(String key,String uid,String uname){
-       /* Intent intent=new Intent();
-                intent.putExtra("key", key);
-                setResult(RESULT_OK,intent);*/
-                //finish();
+    public void action(String key,String job,String uid,String uname){
+        //Toast.makeText(WebViewActivity.this, "action", Toast.LENGTH_SHORT).show();
+        try{
+            Intent intent = new Intent();
+            intent.putExtra("key", key);
+            intent.putExtra("job", job);
+            intent.putExtra("uid", uid);
+            intent.putExtra("uname", uname);
+            //mWeb.getSettings().setJavaScriptEnabled(true);//支持javascript
+            //mWeb.requestFocus();
+            //mWeb.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+            setResult(RESULT_OK, intent);
+            finish();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public class JsInteration{
@@ -102,30 +125,41 @@ public class WebViewActivity extends Activity {
         public JsInteration(WebView mWeb){
             aWeb = mWeb;
         }
+
         @JavascriptInterface
         public void setUserAgent(String val){
             UserAgent = val;
         }
         @JavascriptInterface
-        public Object setUser(String key,String job, String uid, String uname) {
-            /**
-                             key=已組好KEY值
-                             job=哪個社群(google, facebook, twitter, ...?)
-                            uid=UDC USER ID
-                            uname=UDC USER NAME
-                         * */
-            String chkkey = md5( mainKey + "-" + md5( uid + "-" + uname ) );
-            Log.d("key", key);
-            Log.d("uid", uid);
-            Log.d("uname", uname);
+        public void setUser(final String key, final String job, final String uid, final String uname){
+            String chkkey = md5( sJoin("-", mainKey, md5( sJoin("-", uid, uname) )) );
+            Toast.makeText(WebViewActivity.this, "fffffff", Toast.LENGTH_SHORT).show();
+            Log.d("param", "show get data"
+                    +"\nkey: "+ key
+                    +"\njob: "+ job
+                    +"\nuid: "+ uid
+                    +"\nuname: "+ uname
+            );
+            if( chkkey.equals(key) ) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
 
-            if(key == chkkey){
-                action(key,uid,uname);
-                return key.toString();
+                        //取得主要 webview , 載入記憶自動登入並取得使用者相關資料
+                        String url = "https://store.ebais.com.tw/~app/login?remember=1";
+                        action(key,job,uid,uname);
+
+//                        WebView mainWeb = (WebView) findViewById(R.id.Webs);
+//                        mainWeb.loadUrl( url );
+                    }
+                });
             }else{
                 //KEY組起來跟回傳已組好的值不同時處理
+                Log.e("weberror","Key not match!"
+                        + "\nmainKey: "+ mainKey
+                        + "\nchkkey: "+ chkkey
+                );
             }
-            return key.toString();
         }
         @JavascriptInterface
         public void setUser(String key, String job, String uid){
@@ -140,6 +174,16 @@ public class WebViewActivity extends Activity {
             setUser(key, "");
         }
     }
+
+    public String sJoin(String key, String... args){
+        List<String> ls = new ArrayList<String>();
+        for( String argv : args ){
+            ls.add( argv );
+        }
+        String val = TextUtils.join(key, ls );
+        return  val;
+    }
+
 
     public static String md5(String string) {
         byte[] hash;
