@@ -10,7 +10,6 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
-import android.widget.Toast;
 
 import org.apache.cordova.CordovaActivity;
 
@@ -133,7 +132,6 @@ public class WebViewActivity extends CordovaActivity {
         @JavascriptInterface
         public void setUser(final String key, final String job, final String uid, final String uname){
             String chkkey = md5( sJoin("-", mainKey, md5( sJoin("-", uid, uname) )) );
-            Toast.makeText(WebViewActivity.this, "fffffff", Toast.LENGTH_SHORT).show();
             Log.d("param", "show get data"
                     +"\nkey: "+ key
                     +"\njob: "+ job
