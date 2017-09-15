@@ -142,13 +142,11 @@ public class WebViewActivity extends CordovaActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
                         //取得主要 webview , 載入記憶自動登入並取得使用者相關資料
                         String url = "https://store.ebais.com.tw/~app/login?remember=1";
                         action(key,job,uid,uname);
-
-//                        WebView mainWeb = (WebView) findViewById(R.id.Webs);
-//                        mainWeb.loadUrl( url );
+            //                        WebView mainWeb = (WebView) findViewById(R.id.Webs);
+            //                        mainWeb.loadUrl( url );
                     }
                 });
             }else{
