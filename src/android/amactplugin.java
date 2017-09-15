@@ -30,8 +30,6 @@ public class amactplugin extends CordovaPlugin {
     @Override
     public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
         this.callbackContext = callbackContext;
-
-
         if(action.equals("version")){
             try {
                 PackageInfo packageInfo = cordova.getActivity().getPackageManager().getPackageInfo(cordova.getActivity().getPackageName(), 0);
@@ -126,7 +124,7 @@ public class amactplugin extends CordovaPlugin {
             json.put(data.getStringExtra("job"));
             json.put(data.getStringExtra("uid"));
             json.put(data.getStringExtra("uname"));
-            this.callbackContext.success("ok");
+            this.callbackContext.success(json);
         }
     }
 
