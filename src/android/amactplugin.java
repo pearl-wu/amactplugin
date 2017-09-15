@@ -113,7 +113,17 @@ public class amactplugin extends CordovaPlugin {
                       cookieSyncManager.stopSync();
                       cookieSyncManager.sync();
                   }
-          }
+          }else if(action.equals("cookie-set")){
+            CookieSyncManager.createInstance(cordova.getActivity());
+            CookieManager cookieManager = CookieManager.getInstance();
+            String[] d1 = params.getString("d1").split(":");
+            String[] d2 = params.getString("d2").split(":");
+            String[] d3 = params.getString("d3").split(":");
+            cookieManager.setCookie(d1[0], d1[1]);
+            cookieManager.setCookie(d2[0], d2[1]);
+            cookieManager.setCookie(d3[0], d3[1]);
+            this.callbackContext.success("ok");
+        }
         return false;
      }
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
