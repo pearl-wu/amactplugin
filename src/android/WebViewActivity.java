@@ -1,7 +1,7 @@
 package com.bais.amactplugin;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -9,9 +9,9 @@ import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
-
-import org.apache.cordova.CordovaActivity;
+import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -21,7 +21,7 @@ import java.util.List;
 
 import tw.com.bais.amact.R;
 
-public class WebViewActivity extends CordovaActivity {
+public class WebViewActivity extends Activity {
     private WebView mWeb;
     private String url;
     @Override
@@ -33,14 +33,14 @@ public class WebViewActivity extends CordovaActivity {
         Intent intent=new Intent();
 
         mWeb = (WebView) findViewById(R.id.Webs);
-        Button home = (Button)findViewById(R.id.button1);
+        //Button home = (Button)findViewById(R.id.button1);
         Button back = (Button)findViewById(R.id.button2);
         Button refresh = (Button)findViewById(R.id.button3);
-        home.setOnClickListener(new Button.OnClickListener(){
-            public void onClick(View v){
-                mWeb.loadUrl( url );
-            }
-        });
+        /*home.setOnClickListener(new Button.OnClickListener(){
+                        public void onClick(View v){
+                            mWeb.loadUrl( url );
+                        }
+                    });*/
         back.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View v){
                 mWeb.goBack();
@@ -73,7 +73,6 @@ public class WebViewActivity extends CordovaActivity {
         mWeb.addJavascriptInterface(new JsInteration(mWeb), "control");
         settings.setLoadWithOverviewMode(true);
         settings.setBuiltInZoomControls(false);
-        settings.setJavaScriptEnabled(true);
         settings.setDatabaseEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setAllowContentAccess(true);
@@ -81,39 +80,34 @@ public class WebViewActivity extends CordovaActivity {
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowContentAccess(true);
         settings.setAppCacheEnabled(true);
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            settings.setDatabasePath("/data/data/" + mWeb.getContext().getPackageName() + "/databases/");
-        }
-
         settings.setSupportZoom(false);
-
-
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         String ua = "Mozilla/5.0 (eBAIS 1.0) Chrome";
         settings.setUserAgentString(ua);
-        WebViewActivity.this.runOnUiThread(new Runnable() {
-            @Override
-             public void run() {
-                mWeb.loadUrl( url );
-             }
-        });
+        mWeb.setWebViewClient(new InsideWebViewClient());
+        mWeb.loadUrl( url );
     }
 
     public void action(String key,String job,String uid,String uname){
-        //Toast.makeText(WebViewActivity.this, "action", Toast.LENGTH_SHORT).show();
+        Toast.makeText(WebViewActivity.this, "action", Toast.LENGTH_SHORT).show();
         try{
             Intent intent = new Intent();
             intent.putExtra("key", key);
             intent.putExtra("job", job);
             intent.putExtra("uid", uid);
             intent.putExtra("uname", uname);
-            //mWeb.getSettings().setJavaScriptEnabled(true);//支持javascript
-            //mWeb.requestFocus();
-            //mWeb.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
             setResult(RESULT_OK, intent);
             finish();
         } catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+    class InsideWebViewClient extends WebViewClient {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            return true;
         }
     }
 
