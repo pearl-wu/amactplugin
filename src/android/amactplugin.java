@@ -109,21 +109,33 @@ public class amactplugin extends CordovaPlugin {
                       cookieSyncManager.startSync();
                       CookieManager cookieManager = CookieManager.getInstance();
                       cookieManager.removeAllCookie();
-                      cookieManager.removeSessionCookie();
+                      //cookieManager.removeSessionCookie();
                       cookieSyncManager.stopSync();
                       cookieSyncManager.sync();
                   }
           }else if(action.equals("cookie-set")){
             CookieSyncManager.createInstance(cordova.getActivity());
+            CookieSyncManager.getInstance().startSync();
             CookieManager cookieManager = CookieManager.getInstance();
-            String[] d1 = params.getString("d1").split(":");
-            String[] d2 = params.getString("d2").split(":");
-            String[] d3 = params.getString("d3").split(":");
-            cookieManager.setCookie(d1[0], d1[1]);
-            cookieManager.setCookie(d2[0], d2[1]);
-            cookieManager.setCookie(d3[0], d3[1]);
-            this.callbackContext.success("ok");
-        }
+            cookieManager.getInstance().setAcceptCookie(true);
+            params = args.getJSONObject(0);
+            String d1 = params.getString("url");
+            String d2 = params.getString("d1");
+            String d3 = params.getString("d2");
+            String d4 = params.getString("d3");
+            //Toast.makeText(cordova.getActivity(),d2+"......."+d1,Toast.LENGTH_SHORT).show();
+            //String[] d3 = params.getString("d3").split(":");
+            cookieManager.setCookie(d1, d2);
+            cookieManager.setCookie(d1, d3);
+            cookieManager.setCookie(d1, d4);
+            if (Build.VERSION.SDK_INT < 21) {
+                CookieSyncManager.getInstance().sync();
+            } else {
+                CookieManager.getInstance().flush();
+            }
+            String cookie = CookieManager.getInstance().getCookie("https://store.ebais.com.tw/~app/login");
+            this.callbackContext.success(cookie);
+          }
         return false;
      }
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
