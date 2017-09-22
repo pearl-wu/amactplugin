@@ -15,7 +15,6 @@
 			</feature>
 		</config-file>
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
-		      <activity android:name="com.bais.amactplugin.amactplugin" />
 		      <activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale" android:name="com.bais.amactplugin.WebViewActivity" android:theme="@android:style/Theme.Holo.DialogWhenLarge.NoActionBar" />
 			<meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.bais.amactplugin.WebViewActivity" />
 		 </config-file>
