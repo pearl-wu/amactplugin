@@ -135,9 +135,19 @@ public class amactplugin extends CordovaPlugin {
             }
             String cookie = CookieManager.getInstance().getCookie("https://store.ebais.com.tw/~app/login");
             this.callbackContext.success(cookie);
+          }else if(action.equals("encode")){
+            this.params = args.getJSONObject(0);
+            String webUrl = params.getString("url");
+            //code=md5(implode('/',array(KEY,GUID))) 驗證碼
+            //urlencode(base64_encode(json_encode(array(1,2,3)))) 加密
+
+
           }
         return false;
      }
+
+
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         //Toast.makeText(cordova.getActivity(),requestCode+"......",Toast.LENGTH_SHORT).show();
         JSONArray json = new JSONArray();
