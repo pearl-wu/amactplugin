@@ -13,13 +13,14 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
 import tw.com.bais.amact.R;
+
+import static com.bais.amactplugin.encode.MD5;
+
+
 
 public class WebViewActivity extends Activity {
     private WebView mWeb;
@@ -125,7 +126,7 @@ public class WebViewActivity extends Activity {
         }
         @JavascriptInterface
         public void setUser(final String key, final String job, final String uid, final String uname){
-            String chkkey = md5( sJoin("-", mainKey, md5( sJoin("-", uid, uname) )) );
+            String chkkey = MD5( sJoin("-", mainKey, MD5( sJoin("-", uid, uname) )) );
             Log.d("param", "show get data"
                     +"\nkey: "+ key
                     +"\njob: "+ job
@@ -172,24 +173,5 @@ public class WebViewActivity extends Activity {
         }
         String val = TextUtils.join(key, ls );
         return  val;
-    }
-
-
-    public static String md5(String string) {
-        byte[] hash;
-        try {
-            hash = MessageDigest.getInstance("MD5").digest(string.getBytes("UTF-8"));
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Huh, MD5 should be supported?", e);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Huh, UTF-8 should be supported?", e);
-        }
-        StringBuilder hex = new StringBuilder(hash.length * 2);
-        for (byte b : hash) {
-            int i = (b & 0xFF);
-            if (i < 0x10) hex.append('0');
-            hex.append(Integer.toHexString(i));
-        }
-        return hex.toString();
     }
 }
