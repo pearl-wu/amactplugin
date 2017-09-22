@@ -41,6 +41,7 @@
 		
 		<source-file src="src/android/amactplugin.java" target-dir="src/com/bais/amactplugin/" />
 		<source-file src="src/android/WebViewActivity.java" target-dir="src/com/bais/amactplugin/" />
+		<source-file src="src/android/encode.java" target-dir="src/com/bais/amactplugin/" />
 		<source-file src="layout/activity_register.xml" target-dir="res/layout"/>
 	</platform>
 
