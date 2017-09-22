@@ -22,8 +22,6 @@
 		        <string name="title_home">Home</string>
 			<string name="title_refresh">Refresh</string>
 			<string name="title_back">Back</string>
-			<string name="launcher_name"></string>
-			<string name="activity_name"></string>
 		</config-file>
 		<config-file target="res/menu/navigation.xml" parent="/resources">
 		    <item android:id="@+id/home" android:title="@string/title_home" />
