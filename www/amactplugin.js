@@ -32,6 +32,6 @@ exports.clearcookie = function(win, fail){
     exec(win, fail, "amactplugin", "cookie-clear", []);
 }
 
-exports.clearcookie = function(message,win, fail){
+exports.encode = function(message,win, fail){
     exec(win, fail, "amactplugin", "encode", [message]);
 }
