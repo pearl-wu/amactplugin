@@ -29,5 +29,9 @@ exports.setcookie = function(message,win, fail){
 }
 
 exports.clearcookie = function(win, fail){
-    exec(win, fail, "amactplugin", "cookie-clear", [message]);
+    exec(win, fail, "amactplugin", "cookie-clear", []);
+}
+
+exports.clearcookie = function(message,win, fail){
+    exec(win, fail, "amactplugin", "encode", [message]);
 }
