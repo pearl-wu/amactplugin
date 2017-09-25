@@ -11,7 +11,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +89,6 @@ public class WebViewActivity extends Activity {
     }
 
     public void action(String key,String job,String uid,String uname){
-        Toast.makeText(WebViewActivity.this, "action", Toast.LENGTH_SHORT).show();
         try{
             Intent intent = new Intent();
             intent.putExtra("key", key);
