@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Base64;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.Toast;
@@ -18,6 +20,12 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.util.List;
+
+import static com.bais.amactplugin.encode.MD5;
 
 public class amactplugin extends CordovaPlugin {
     private CallbackContext callbackContext;
@@ -50,16 +58,43 @@ public class amactplugin extends CordovaPlugin {
         }else if(action.equals("openapp")){
             this.params = args.getJSONObject(0);
             String webUrl = params.getString("url");
-            Intent intent =  cordova.getActivity().getPackageManager().getLaunchIntentForPackage(webUrl);
-            // intent空，沒安装
-            if (intent != null) {
-                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-                Toast.makeText(cordova.getActivity(),"開啟IBC...",Toast.LENGTH_SHORT).show();
-                //intent.putExtra("name", "air.tw.com.bais.ibc");
-                 cordova.getActivity().startActivity(intent);
-            } else {
-                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
-                Toast.makeText(cordova.getActivity(),"尚未安裝IBC",Toast.LENGTH_LONG).show();
+            try {
+                if (webUrl.startsWith("intent://")) {
+                    Intent intent;
+                    try {
+                        intent = Intent.parseUri(webUrl, Intent.URI_INTENT_SCHEME);
+                        intent.addCategory("android.intent.category.BROWSABLE");
+                        intent.setComponent(null);
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                            intent.setSelector(null);
+                        }
+                        cordova.getActivity().startActivityIfNeeded(intent, -1);
+                        List<ResolveInfo> resolves = cordova.getActivity().getPackageManager().queryIntentActivities(intent, 0);
+
+                        if(resolves.size()>0){
+                            cordova.getActivity().startActivityIfNeeded(intent, -1);
+                            Toast.makeText(cordova.getActivity(),"開啟IBC...",Toast.LENGTH_SHORT).show();
+                        }
+                        return true;
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (!webUrl.startsWith("http")) {
+                    try {
+                        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(webUrl));
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK  | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        cordova.getActivity().startActivity(intent);
+                        Toast.makeText(cordova.getActivity(),"開啟IBC...",Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(cordova.getActivity(),"尚未安裝IBC",Toast.LENGTH_LONG).show();
+                    }
+                    return true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
             return true;
           }else if(action.equals("openwebshow")){
@@ -137,12 +172,26 @@ public class amactplugin extends CordovaPlugin {
             this.callbackContext.success(cookie);
           }else if(action.equals("encode")){
             this.params = args.getJSONObject(0);
-            String webUrl = params.getString("url");
-            //code=md5(implode('/',array(KEY,GUID))) 驗證碼
-            //urlencode(base64_encode(json_encode(array(1,2,3)))) 加密
+            JSONArray json = new JSONArray();
+            String cookie1 = params.getString("d1");
+            String cookie2 = params.getString("d2");
+            String guid = params.getString("d3");
+            String key = "5c3b3ac2abf098b325d89005deccd7e6";
+            //驗證
+            String[] strarrc = {key,guid};
+            String code_c = MD5(implode("/", strarrc));
 
-
-          }
+            //加密
+            JSONArray jsonArray = new JSONArray();
+            jsonArray.put(cookie1);
+            jsonArray.put(cookie2);
+            jsonArray.put(guid);
+            String Encoded = Base64.encodeToString((jsonArray.toString()).getBytes(), Base64.DEFAULT);
+            String code_p = URLEncoder.encode( Encoded );
+            json.put(code_c);
+            json.put(code_p);
+            this.callbackContext.success(json);
+        }
         return false;
      }
 
@@ -180,4 +229,20 @@ public class amactplugin extends CordovaPlugin {
           subscribeCallbackContext = null;
         }
       }
+    private static String implode(String glue, String[] array){
+        boolean first = true;
+        StringBuilder str = new StringBuilder();
+        for (String s : array) {
+            if (!first) str.append(glue);
+            str.append(s);
+            first = false;
+        }
+        return str.toString();
+    }
+
+
+    public static class DealedUrl {
+        public String url;
+        public String params;
+    }
 }
