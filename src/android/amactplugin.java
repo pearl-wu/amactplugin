@@ -58,14 +58,14 @@ public class amactplugin extends CordovaPlugin {
         }else if(action.equals("openapp")){
             this.params = args.getJSONObject(0);
             String webUrl = params.getString("url");
+            String webApp = params.getString("app");
             try {
+                Intent intent;
                 if (webUrl.startsWith("intent://")) {
-                    Intent intent;
                     try {
                         intent = Intent.parseUri(webUrl, Intent.URI_INTENT_SCHEME);
                         intent.addCategory("android.intent.category.BROWSABLE");
                         intent.setComponent(null);
-
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
                             intent.setSelector(null);
                         }
@@ -74,7 +74,7 @@ public class amactplugin extends CordovaPlugin {
 
                         if(resolves.size()>0){
                             cordova.getActivity().startActivityIfNeeded(intent, -1);
-                            Toast.makeText(cordova.getActivity(),"開啟IBC...",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(cordova.getActivity(),"開啟中...",Toast.LENGTH_SHORT).show();
                         }
                         return true;
                     } catch (URISyntaxException e) {
@@ -83,13 +83,18 @@ public class amactplugin extends CordovaPlugin {
                 }
                 if (!webUrl.startsWith("http")) {
                     try {
-                        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(webUrl));
+                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse(webUrl));
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK  | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         cordova.getActivity().startActivity(intent);
-                        Toast.makeText(cordova.getActivity(),"開啟IBC...",Toast.LENGTH_SHORT).show();
+                        this.callbackContext.success("開啟中，請稍待...");
+                        //Toast.makeText(cordova.getActivity(),"開啟IBC",Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Toast.makeText(cordova.getActivity(),"尚未安裝IBC",Toast.LENGTH_LONG).show();
+                        this.callbackContext.error("開啟失敗");
+                        //Toast.makeText(cordova.getActivity(),"尚未安裝IBC, 前往Google play 安裝IBC。",Toast.LENGTH_LONG).show();
+                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse(webApp));
+                        cordova.getActivity().startActivity(intent);
+
                     }
                     return true;
                 }
