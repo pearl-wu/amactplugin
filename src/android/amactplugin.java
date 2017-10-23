@@ -74,7 +74,7 @@ public class amactplugin extends CordovaPlugin {
 
                         if(resolves.size()>0){
                             cordova.getActivity().startActivityIfNeeded(intent, -1);
-                            Toast.makeText(cordova.getActivity(),"開啟中...",Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(cordova.getActivity(),"開啟中...",Toast.LENGTH_SHORT).show();
                         }
                         return true;
                     } catch (URISyntaxException e) {
