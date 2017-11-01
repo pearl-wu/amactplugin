@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
@@ -11,7 +12,6 @@ import android.os.Build;
 import android.util.Base64;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-import android.widget.Toast;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -21,8 +21,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.bais.amactplugin.encode.MD5;
@@ -39,13 +43,7 @@ public class amactplugin extends CordovaPlugin {
     public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
         this.callbackContext = callbackContext;
         if(action.equals("version")){
-            try {
-                PackageInfo packageInfo = cordova.getActivity().getPackageManager().getPackageInfo(cordova.getActivity().getPackageName(), 0);
-                this.callbackContext.success(packageInfo.versionName);
-            } catch (NameNotFoundException e) {
-                //Handle exception
-                this.callbackContext.error(e.hashCode());
-            }
+            this.callbackContext.success(isUpdate()+"");
           return true;
        }else if(action.equals("openweb")){
             this.params = args.getJSONObject(0);
@@ -196,7 +194,42 @@ public class amactplugin extends CordovaPlugin {
         return false;
      }
 
-
+    /*** 檢查軟件是否有更新版本**/
+    private boolean isUpdate(){
+        int versionCode = getVersionCode();
+        ParseXmlService service = new ParseXmlService();// 解析XML文件。使用DOM方式進行解析
+        HashMap<String, String> mHashMap = null;
+        try{
+            URL myUrl = new URL("");
+            HttpURLConnection myConnection = (HttpURLConnection) myUrl.openConnection();
+            myConnection.setConnectTimeout(5000);
+            int state = myConnection.getResponseCode();
+            InputStream inStream = myConnection.getInputStream();
+            mHashMap = service.parseXml(inStream);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        if (null != mHashMap){
+            int serviceCode = Integer.valueOf(mHashMap.get("version"));
+            // 版本判斷
+            //Log.i("test........", serviceCode+"(serviceCode)"+versionCode+"(versionCode)");
+            if (serviceCode > versionCode){
+                return true;
+            }
+        }
+        return false;
+    }
+    /*** 獲取軟件版本號**/
+    private int getVersionCode() {
+        PackageManager packageManager = cordova.getActivity().getPackageManager();
+        try {
+            PackageInfo packageInfo = packageManager.getPackageInfo(cordova.getActivity().getPackageName(), 0);
+            return packageInfo.versionCode;
+        } catch (NameNotFoundException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         //Toast.makeText(cordova.getActivity(),requestCode+"......",Toast.LENGTH_SHORT).show();
