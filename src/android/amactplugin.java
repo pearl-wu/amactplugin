@@ -136,10 +136,6 @@ public class amactplugin extends CordovaPlugin {
                  String cookie = CookieManager.getInstance().getCookie(webUrl);
                 // String[] AfterSplit = cookie.split(",");
                 this.callbackContext.success(cookie);
-               // Log.d("cookie ", cookie);
-               //Log.d("PHPGUID: ", CookieManager.getInstance().getCookie("PHPGUID"));
-               //Log.d("MjMtZA%3D%3D: ", CookieManager.getInstance().getCookie("MjMtZA%3D%3D"));
-               //Log.d("MjMtcw%3D%3D: ", CookieManager.getInstance().getCookie("MjMtcw%3D%3D"));
           }else if(action.equals("cookie-clear")){
                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
                       CookieManager.getInstance().removeAllCookies(null);
