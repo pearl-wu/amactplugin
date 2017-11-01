@@ -173,7 +173,7 @@ public class amactplugin extends CordovaPlugin {
             } else {
                 CookieManager.getInstance().flush();
             }
-            String cookie = CookieManager.getInstance().getCookie("https://store.ebais.com.tw/~app/login");
+            String cookie = CookieManager.getInstance().getCookie("");
             this.callbackContext.success(cookie);
           }else if(action.equals("encode")){
             this.params = args.getJSONObject(0);
