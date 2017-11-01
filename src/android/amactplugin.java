@@ -181,7 +181,7 @@ public class amactplugin extends CordovaPlugin {
             String cookie1 = params.getString("d1");
             String cookie2 = params.getString("d2");
             String guid = params.getString("d3");
-            String key = "5c3b3ac2abf098b325d89005deccd7e6";
+            String key = "";
             //驗證
             String[] strarrc = {key,guid};
             String code_c = MD5(implode("/", strarrc));
