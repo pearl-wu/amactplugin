@@ -11,17 +11,13 @@ import java.util.HashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-/**
- * Created by pearl on 2017/11/1.
- */
-
 public class ParseXmlService {
     public HashMap<String, String> parseXml(InputStream inStream) throws Exception{
         HashMap<String, String> hashMap = new HashMap<String, String>();
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();// 實例化一個文檔
-        DocumentBuilder builder = factory.newDocumentBuilder();// 通過文檔獲取一個文檔
-        Document document = builder.parse(inStream);// 通過文檔通過文檔構建器構建一個文檔實例
-        Element root = document.getDocumentElement();//獲取XML文件根節點
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(inStream);
+        Element root = document.getDocumentElement();
         NodeList childNodes = root.getChildNodes();
         for (int j = 0; j < childNodes.getLength(); j++){
             Node childNode = (Node) childNodes.item(j);
