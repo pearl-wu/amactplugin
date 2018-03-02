@@ -44,5 +44,13 @@
 		<source-file src="src/android/ParseXmlService.java" target-dir="src/com/bais/amactplugin/" />
 		<source-file src="layout/activity_register.xml" target-dir="res/layout"/>
 	</platform>
+	<platform name="ios">
+		<config-file target="config.xml" parent="/*">
+	    		<feature name="amactplugin">
+					<param name="ios-package" value="amactplugin" />
+	    		</feature>
+		</config-file>
+		<source-file src="src/ios/amactplugin.swift" />
+	</platform>
 
 </plugin>
