@@ -2,9 +2,6 @@
 <plugin id="bais-plugin-amact" version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>amactplugin</name>
 	<description></description>
-	<engines>
-        	<engine name="cordova" version=">=4.1.1"/>
-    	</engines>
 	<js-module name="amactplugin" src="www/amactplugin.js">
 		<clobbers target="amactplugin" />
 	</js-module>
