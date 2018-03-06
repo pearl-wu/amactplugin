@@ -1,32 +1,30 @@
 var exec = require('cordova/exec');
-
-
 module.exports = {
-    version : function(win, fail){
+    version : function (win, fail){
         exec(win, fail, "amactplugin", "version", []);
     },
-    openapp: function(message, win, fail){
+    openapp: function (message, win, fail){
         exec(win, fail, "amactplugin", "openapp", [message]);
     },
-    openweb: function(message, win, fail){
+    openweb: function (message, win, fail){
         exec(win, fail, "amactplugin", "openweb", [message]);
     },
-    openwebshow: function(message, win, fail){
+    openwebshow: function (message, win, fail){
         exec(win, fail, "amactplugin", "openwebshow", [message]);
     },
-    openwebclose: function(win, fail){
+    openwebclose: function (win, fail){
         exec(win, fail, "amactplugin", "openwebclose", []);
     },
-    getcookie: function(message,win, fail){
+    getcookie: function (message,win, fail){
         exec(win, fail, "amactplugin", "cookieget", [message]);
     },
-    setcookie: function(message,win, fail){
+    setcookie: function (message,win, fail){
         exec(win, fail, "amactplugin", "cookieset", [message]);
     },
-    clearcookie: function(win, fail){
+    clearcookie: function (win, fail){
         exec(win, fail, "amactplugin", "cookieclear", []);
     },
-    encode: function(message,win, fail){
+    encode: function (message,win, fail){
         exec(win, fail, "amactplugin", "encode", [message]);
     }
-}
+};
