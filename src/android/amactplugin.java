@@ -1,6 +1,7 @@
 package com.bais.amactplugin;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
@@ -9,9 +10,13 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.widget.Toast;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -43,14 +48,24 @@ public class amactplugin extends CordovaPlugin {
     public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
         this.callbackContext = callbackContext;
         if(action.equals("version")){
-            this.callbackContext.success(isUpdate()+"");
+            TelephonyManager manager = (TelephonyManager) cordova.getActivity().getSystemService(Context.TELEPHONY_SERVICE);
+            String android_id = Settings.Secure.getString(cordova.getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
+           // String deviceId = manager.getSubscriberId();
+            DisplayMetrics dm = new DisplayMetrics();
+            this.cordova.getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+            int width = dm.widthPixels;
+            int height = dm.heightPixels;
+            this.callbackContext.success(isUpdate()+"/"+MD5(android_id)+"/"+width+"/"+height);
           return true;
        }else if(action.equals("openweb")){
             this.params = args.getJSONObject(0);
             String webUrl = params.getString("url");
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-            Uri uri = Uri.parse(webUrl);
-            Intent intent = new Intent(Intent.ACTION_VIEW,uri);
+            //Uri uri = Uri.parse(webUrl);
+            //Intent intent = new Intent(Intent.ACTION_VIEW,uri);
+            Intent intent = new Intent(cordova.getActivity(), WebViewActivity.class);
+            intent.putExtra("url", webUrl);
+            intent.putExtra("onlyBrowser", true);
             cordova.getActivity().startActivity(intent);
             return true;
         }else if(action.equals("openapp")){
@@ -62,39 +77,27 @@ public class amactplugin extends CordovaPlugin {
                 if (webUrl.startsWith("intent://")) {
                     try {
                         intent = Intent.parseUri(webUrl, Intent.URI_INTENT_SCHEME);
-                        intent.addCategory("android.intent.category.BROWSABLE");
-                        intent.setComponent(null);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                            intent.setSelector(null);
+                        if(intent != null) {
+                            PackageManager packageManager = cordova.getActivity().getPackageManager();
+                            ResolveInfo info = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+                            if (info != null) {
+                                intent.addCategory("android.intent.category.BROWSABLE");
+                                intent.setComponent(null);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) { intent.setSelector(null); }
+                                cordova.getActivity().startActivityIfNeeded(intent, -1);
+                                List<ResolveInfo> resolves = cordova.getActivity().getPackageManager().queryIntentActivities(intent, 0);
+                                if (resolves.size() > 0) { cordova.getActivity().startActivityIfNeeded(intent, -1); }
+                                return true;
+                            }else{
+                                Toast.makeText(cordova.getActivity(), "尚未安裝IBC, 前往Google play 安裝IBC。", Toast.LENGTH_LONG).show();
+                                intent = new Intent(Intent.ACTION_VIEW, Uri.parse(webApp));
+                                cordova.getActivity().startActivity(intent);
+                                return false;
+                            }
                         }
-                        cordova.getActivity().startActivityIfNeeded(intent, -1);
-                        List<ResolveInfo> resolves = cordova.getActivity().getPackageManager().queryIntentActivities(intent, 0);
-
-                        if(resolves.size()>0){
-                            cordova.getActivity().startActivityIfNeeded(intent, -1);
-                            //Toast.makeText(cordova.getActivity(),"開啟中...",Toast.LENGTH_SHORT).show();
-                        }
-                        return true;
                     } catch (URISyntaxException e) {
                         e.printStackTrace();
                     }
-                }
-                if (!webUrl.startsWith("http")) {
-                    try {
-                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse(webUrl));
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK  | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                        cordova.getActivity().startActivity(intent);
-                        this.callbackContext.success("開啟中，請稍待...");
-                        //Toast.makeText(cordova.getActivity(),"開啟IBC",Toast.LENGTH_SHORT).show();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        this.callbackContext.error("開啟失敗");
-                        //Toast.makeText(cordova.getActivity(),"尚未安裝IBC, 前往Google play 安裝IBC。",Toast.LENGTH_LONG).show();
-                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse(webApp));
-                        cordova.getActivity().startActivity(intent);
-
-                    }
-                    return true;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -110,13 +113,11 @@ public class amactplugin extends CordovaPlugin {
               try{
                   shouldShowLoading = args.getBoolean(1);
               }
-              catch(Exception e){
-
-              }
+              catch(Exception e){}
              if(!"".equals(webUrl)) {
                 showWebView(webUrl, shouldShowLoading);
-                JSONObject r = new JSONObject();
-                r.put("responseCode", "ok");
+                //JSONObject r = new JSONObject();
+                //r.put("responseCode", "ok");
                 //callbackContext.success(r);
               }
               return true;
@@ -134,6 +135,10 @@ public class amactplugin extends CordovaPlugin {
                  String cookie = CookieManager.getInstance().getCookie(webUrl);
                 // String[] AfterSplit = cookie.split(",");
                 this.callbackContext.success(cookie);
+               // Log.d("cookie ", cookie);
+               //Log.d("PHPGUID: ", CookieManager.getInstance().getCookie("PHPGUID"));
+               //Log.d("MjMtZA%3D%3D: ", CookieManager.getInstance().getCookie("MjMtZA%3D%3D"));
+               //Log.d("MjMtcw%3D%3D: ", CookieManager.getInstance().getCookie("MjMtcw%3D%3D"));
           }else if(action.equals("cookieclear")){
                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
                       CookieManager.getInstance().removeAllCookies(null);
@@ -167,7 +172,7 @@ public class amactplugin extends CordovaPlugin {
             } else {
                 CookieManager.getInstance().flush();
             }
-            String cookie = CookieManager.getInstance().getCookie("");
+            String cookie = CookieManager.getInstance().getCookie("https://iam.ebais.net/~app/login");
             this.callbackContext.success(cookie);
           }else if(action.equals("encode")){
             this.params = args.getJSONObject(0);
@@ -200,7 +205,7 @@ public class amactplugin extends CordovaPlugin {
         ParseXmlService service = new ParseXmlService();// 解析XML文件。使用DOM方式進行解析
         HashMap<String, String> mHashMap = null;
         try{
-            URL myUrl = new URL("");
+            URL myUrl = new URL("https://iam.ebais.net/version.xml");
             HttpURLConnection myConnection = (HttpURLConnection) myUrl.openConnection();
             myConnection.setConnectTimeout(5000);
             int state = myConnection.getResponseCode();
@@ -272,11 +277,5 @@ public class amactplugin extends CordovaPlugin {
             first = false;
         }
         return str.toString();
-    }
-
-
-    public static class DealedUrl {
-        public String url;
-        public String params;
     }
 }
