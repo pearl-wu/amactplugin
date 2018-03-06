@@ -126,7 +126,7 @@ public class amactplugin extends CordovaPlugin {
               JSONObject r = new JSONObject();
               r.put("responseCode", "ok");
               this.callbackContext.success(r);
-          }else if(action.equals("cookie-get")){
+          }else if(action.equals("cookieget")){
               this.params = args.getJSONObject(0);
               String webUrl = params.getString("url");
               CookieManager.setAcceptFileSchemeCookies(true); //available in android level 12
@@ -134,7 +134,7 @@ public class amactplugin extends CordovaPlugin {
                  String cookie = CookieManager.getInstance().getCookie(webUrl);
                 // String[] AfterSplit = cookie.split(",");
                 this.callbackContext.success(cookie);
-          }else if(action.equals("cookie-clear")){
+          }else if(action.equals("cookieclear")){
                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
                       CookieManager.getInstance().removeAllCookies(null);
                       CookieManager.getInstance().flush();
@@ -147,7 +147,7 @@ public class amactplugin extends CordovaPlugin {
                       cookieSyncManager.stopSync();
                       cookieSyncManager.sync();
                   }
-          }else if(action.equals("cookie-set")){
+          }else if(action.equals("cookieset")){
             CookieSyncManager.createInstance(cordova.getActivity());
             CookieSyncManager.getInstance().startSync();
             CookieManager cookieManager = CookieManager.getInstance();
