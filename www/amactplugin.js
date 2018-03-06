@@ -21,15 +21,15 @@ exports.openwebclose = function(win, fail){
 }
 
 exports.getcookie = function(message,win, fail){
-    exec(win, fail, "amactplugin", "cookie-get", [message]);
+    exec(win, fail, "amactplugin", "cookieget", [message]);
 }
 
 exports.setcookie = function(message,win, fail){
-    exec(win, fail, "amactplugin", "cookie-set", [message]);
+    exec(win, fail, "amactplugin", "cookieset", [message]);
 }
 
 exports.clearcookie = function(win, fail){
-    exec(win, fail, "amactplugin", "cookie-clear", []);
+    exec(win, fail, "amactplugin", "cookieclear", []);
 }
 
 exports.encode = function(message,win, fail){
