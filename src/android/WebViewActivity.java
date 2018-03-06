@@ -173,7 +173,7 @@ public class WebViewActivity extends Activity {
     public class JsInteration{
         private WebView aWeb = null;
         private String UserAgent = null;
-        private String mainKey = "5c3b3ac2abf098b325d89005deccd7e6";
+        private String mainKey = "";
         public JsInteration(WebView mWeb){ aWeb = mWeb; }
 
         @JavascriptInterface
