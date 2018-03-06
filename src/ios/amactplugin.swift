@@ -25,19 +25,19 @@
         self.commandDelegate!.send(pluginResult,callbackId: command.callbackId)
     }
 	
-    func getcookie(_ command: CDVInvokedUrlCommand) {
+    func cookieget(_ command: CDVInvokedUrlCommand) {
         print("getcookie")
        // self.cmd = command
        // self.msgUnReadInitDelaySend()
     }
 	
-    func setcookie(_ command: CDVInvokedUrlCommand) {
+    func cookieset(_ command: CDVInvokedUrlCommand) {
         print("setcookie")
        // self.cmd = command
        // self.msgUnReadInitDelaySend()
     }
 	
-    func clearcookie(_ command: CDVInvokedUrlCommand) {
+    func cookieclear(_ command: CDVInvokedUrlCommand) {
         print("clearcookie")
        // self.cmd = command
        // self.msgUnReadInitDelaySend()
