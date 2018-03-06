@@ -12,7 +12,9 @@
 			</feature>
 		</config-file>
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
-		      <activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale" android:name="com.bais.amactplugin.WebViewActivity" android:theme="@android:style/Theme.Holo.DialogWhenLarge.NoActionBar" />
+			<activity android:name="com.bais.amactplugin.amactplugin" />
+		        <activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale" android:name="com.bais.amactplugin.WebViewActivity_s" android:theme="@android:style/Theme.Wallpaper.NoTitleBar" />
+        		<activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale" android:name="com.bais.amactplugin.WebViewActivity" android:theme="@android:style/Theme.Holo.DialogWhenLarge.NoActionBar" />
 			<meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.bais.amactplugin.WebViewActivity" />
 		 </config-file>
 		<config-file target="res/values/strings.xml" parent="/resources">
@@ -37,6 +39,7 @@
 		
 		<source-file src="src/android/amactplugin.java" target-dir="src/com/bais/amactplugin/" />
 		<source-file src="src/android/WebViewActivity.java" target-dir="src/com/bais/amactplugin/" />
+		<source-file src="src/android/WebViewActivity_s.java" target-dir="src/com/bais/amactplugin/" />
 		<source-file src="src/android/encode.java" target-dir="src/com/bais/amactplugin/" />
 		<source-file src="src/android/ParseXmlService.java" target-dir="src/com/bais/amactplugin/" />
 		<source-file src="layout/activity_register.xml" target-dir="res/layout"/>
